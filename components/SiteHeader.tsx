@@ -146,14 +146,17 @@ export function SiteHeader() {
           </div>
 
           <Link href="/" className="logo" aria-label="Mohrbaugh home">
-            <img
-              className="logo-img"
-              src="/logo.svg"
-              alt=""
-              width={1768}
-              height={1800}
-              decoding="async"
-            />
+            <picture>
+              <source media="(max-width: 319px)" srcSet="/logo-compact.svg" />
+              <img
+                className="logo-img"
+                src="/logo.svg"
+                alt=""
+                width={1600}
+                height={645}
+                decoding="async"
+              />
+            </picture>
           </Link>
 
           <div className="header-right">
