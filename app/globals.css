@@ -1175,6 +1175,14 @@ body:has(.announcement-bar) .search-page-loading {
   height: 100%;
   object-fit: cover;
 }
+.search-result-card-image-link,
+.search-result-card-details {
+  display: block;
+}
+.search-result-card-details:hover .search-result-card-name {
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+}
 
 .search-result-card-name {
   margin: 0 0 0.2rem;
