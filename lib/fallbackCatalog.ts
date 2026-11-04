@@ -66,6 +66,15 @@ export function getFallbackCatalog(
   return fallbackProducts.slice(offset, offset + limit);
 }
 
+export function getFallbackProduct(
+  productId: string
+): ApiProduct | null {
+  return (
+    fallbackProducts.find((product) => product.id === productId) ??
+    null
+  );
+}
+
 export function getFallbackFilterOptions() {
   const categories = new Set<string>();
   const genders = new Set<string>();

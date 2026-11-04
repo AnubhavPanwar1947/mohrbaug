@@ -1,6 +1,7 @@
 import {
   getFallbackCatalog,
   getFallbackFilterOptions,
+  getFallbackProduct,
   isApiConnectionError,
   searchFallbackCatalog,
 } from "@/lib/fallbackCatalog";
@@ -357,7 +358,17 @@ export async function getRecommendations(
 export async function getProduct(
   productId: string
 ): Promise<ApiProduct> {
-  return requestJson<ApiProduct>(
-    `/products/${encodeURIComponent(productId)}`
-  );
+  try {
+    return await requestJson<ApiProduct>(
+      `/products/${encodeURIComponent(productId)}`
+    );
+  } catch (error) {
+    const fallback = getFallbackProduct(productId);
+
+    if (fallback) {
+      return fallback;
+    }
+
+    throw error;
+  }
 }

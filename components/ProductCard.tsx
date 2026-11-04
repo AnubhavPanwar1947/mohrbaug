@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import type { ApiProduct } from "@/lib/recommendationApi";
 import { ProductImage } from "@/components/ProductImage";
@@ -12,6 +13,7 @@ export function ProductCard({
   product,
 }: ProductCardProps) {
   const [saved, setSaved] = useState(false);
+  const productHref = `/products/${encodeURIComponent(product.id)}`;
 
   return (
     <article
@@ -19,12 +21,18 @@ export function ProductCard({
       data-product-id={product.id}
     >
       <div className="product-card-media">
-      <ProductImage
-  src={product.imageUrl}
-  alt={product.name}
-  width={600}
-  height={750}
-/>
+        <Link
+          href={productHref}
+          className="product-card-link"
+          aria-label={`View ${product.name}`}
+        >
+          <ProductImage
+            src={product.imageUrl}
+            alt={product.name}
+            width={600}
+            height={750}
+          />
+        </Link>
 
         <button
           type="button"
@@ -38,7 +46,7 @@ export function ProductCard({
       </div>
 
       <h3 className="product-name">
-        {product.name}
+        <Link href={productHref}>{product.name}</Link>
       </h3>
 
       <p className="product-price">
