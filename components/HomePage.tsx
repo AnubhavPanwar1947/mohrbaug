@@ -1,24 +1,21 @@
+import Link from "next/link";
+
 import { shopCategories } from "@/lib/catalog";
 import { NewArrivals } from "@/components/NewArrivals";
 import { ProductCard } from "@/components/ProductCard";
 import type { ApiProduct } from "@/lib/recommendationApi";
 
 type HomePageProps = {
-  products: ApiProduct[];
+  newArrivals: ApiProduct[];
+  bestsellers: ApiProduct[];
 };
 
-export function HomePage({ products }: HomePageProps) {
-  const newArrivals = products.slice(0, 8);
-
-  const bestsellers = [...products]
-    .sort(
-      (first, second) =>
-        (second.popularity ?? 0) - (first.popularity ?? 0)
-    )
-    .slice(0, 8);
-
+export function HomePage({
+  newArrivals,
+  bestsellers,
+}: HomePageProps) {
   return (
-    <main id="main">
+    <main id="main" className="home-page">
       <section className="hero-split" aria-label="Featured collections">
         <article className="hero-panel hero-panel--women">
           <img
@@ -30,9 +27,9 @@ export function HomePage({ products }: HomePageProps) {
 
           <div className="hero-panel-content">
             <p className="hero-label">Women</p>
-            <a href="#" className="hero-cta">
+            <Link href="/category/women" className="hero-cta">
               Shop women
-            </a>
+            </Link>
           </div>
         </article>
 
@@ -46,9 +43,9 @@ export function HomePage({ products }: HomePageProps) {
 
           <div className="hero-panel-content">
             <p className="hero-label">Men</p>
-            <a href="#" className="hero-cta">
+            <Link href="/category/men" className="hero-cta">
               Shop men
-            </a>
+            </Link>
           </div>
         </article>
       </section>
@@ -64,7 +61,11 @@ export function HomePage({ products }: HomePageProps) {
         <ul className="category-grid">
           {shopCategories.map((category) => (
             <li key={category.label}>
-              <a href="#" className="category-tile">
+              <Link
+                href={category.href}
+                className="category-tile"
+                aria-label={`Shop ${category.label}`}
+              >
                 <img
                   src={category.image}
                   alt=""
@@ -75,7 +76,7 @@ export function HomePage({ products }: HomePageProps) {
                 <span className="category-tile-label">
                   {category.label}
                 </span>
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -103,9 +104,12 @@ export function HomePage({ products }: HomePageProps) {
             evening without changing the mood.
           </p>
 
-          <a href="#" className="editorial-link">
+          <Link
+            href="/category/outerwear"
+            className="editorial-link"
+          >
             Shop the look
-          </a>
+          </Link>
         </div>
       </section>
 
@@ -116,9 +120,12 @@ export function HomePage({ products }: HomePageProps) {
         <div className="section-header">
           <h2 id="bestsellers-heading">Bestsellers</h2>
 
-          <a href="#" className="view-all-link">
+          <Link
+            href="/collections/bestsellers"
+            className="view-all-link"
+          >
             View all
-          </a>
+          </Link>
         </div>
 
         <ul className="product-grid">

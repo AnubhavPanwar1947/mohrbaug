@@ -1,10 +1,22 @@
 import { HomePage } from "@/components/HomePage";
+import { SiteChrome } from "@/components/SiteChrome";
 import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
-import { getCatalog } from "@/lib/recommendationApi";
+import { getCatalogWithMeta } from "@/lib/recommendationApi";
 
 export default async function Page() {
-  const products = await getCatalog(16);
+  const [newArrivalsResponse, bestsellersResponse] =
+    await Promise.all([
+      getCatalogWithMeta({
+        limit: 8,
+        offset: 0,
+        sort: "newest",
+      }),
+      getCatalogWithMeta({
+        limit: 8,
+        offset: 0,
+        sort: "rating",
+      }),
+    ]);
 
   return (
     <>
@@ -12,8 +24,11 @@ export default async function Page() {
         Skip to content
       </a>
 
-      <SiteHeader />
-      <HomePage products={products} />
+      <SiteChrome withAnnouncement={false} />
+      <HomePage
+        newArrivals={newArrivalsResponse.results}
+        bestsellers={bestsellersResponse.results}
+      />
       <SiteFooter />
     </>
   );

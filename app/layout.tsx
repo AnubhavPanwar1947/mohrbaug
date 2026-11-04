@@ -1,20 +1,9 @@
 import type { Metadata } from "next";
-import { Barlow, Barlow_Condensed } from "next/font/google";
+import { Suspense } from "react";
+
+import { ScrollToTopOnNavigate } from "@/components/ScrollToTopOnNavigate";
+import { ShopProvider } from "@/components/ShopProvider";
 import "./globals.css";
-
-const barlow = Barlow({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-barlow",
-  display: "swap",
-});
-
-const barlowCondensed = Barlow_Condensed({
-  subsets: ["latin"],
-  weight: ["600", "700"],
-  variable: "--font-barlow-condensed",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Mohrbaugh — Men & Women Clothing",
@@ -27,8 +16,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${barlow.variable} ${barlowCondensed.variable}`}>
-      <body>{children}</body>
+    <html lang="en">
+      <body>
+        <ShopProvider>
+          <Suspense fallback={null}>
+            <ScrollToTopOnNavigate />
+          </Suspense>
+          {children}
+        </ShopProvider>
+      </body>
     </html>
   );
 }

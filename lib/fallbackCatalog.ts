@@ -36,6 +36,8 @@ function toApiProduct(
   item: (typeof newArrivals)[number],
   index: number
 ): ApiProduct {
+  const imageUrl = item.image;
+
   return {
     id: `fallback-${index + 1}`,
     name: item.name,
@@ -48,7 +50,7 @@ function toApiProduct(
     rating: 4.2,
     sizes: ["XS", "S", "M", "L", "XL"],
     stock: 12,
-    imageUrl: item.image,
+    imageUrl,
   };
 }
 

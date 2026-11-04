@@ -1,8 +1,27 @@
+import Link from "next/link";
+
 import { NewsletterForm } from "@/components/NewsletterForm";
 
-const shopLinks = ["Women", "Men", "New arrivals", "Bestsellers"];
-const helpLinks = ["Shipping", "Returns", "Size guide", "Contact"];
-const aboutLinks = ["Our story", "Sustainability", "Careers", "Stores"];
+const shopLinks = [
+  { label: "Women", href: "/category/women" },
+  { label: "Men", href: "/category/men" },
+  { label: "New arrivals", href: "/collections/new-arrivals" },
+  { label: "Bestsellers", href: "/collections/bestsellers" },
+  { label: "Shop all", href: "/shop" },
+];
+
+const helpLinks = [
+  { label: "Shipping & returns", href: "/shipping-returns" },
+  { label: "Size guide", href: "/size-guide" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Contact", href: "/contact" },
+];
+
+const aboutLinks = [
+  { label: "Our story", href: "/about" },
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
+];
 
 export function SiteFooter() {
   return (
@@ -11,9 +30,11 @@ export function SiteFooter() {
         <div className="footer-col">
           <h3>Shop</h3>
           <ul>
-            {shopLinks.map((label) => (
-              <li key={label}>
-                <a href="#">{label}</a>
+            {shopLinks.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="footer-link">
+                  {item.label}
+                </Link>
               </li>
             ))}
           </ul>
@@ -21,9 +42,11 @@ export function SiteFooter() {
         <div className="footer-col">
           <h3>Help</h3>
           <ul>
-            {helpLinks.map((label) => (
-              <li key={label}>
-                <a href="#">{label}</a>
+            {helpLinks.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="footer-link">
+                  {item.label}
+                </Link>
               </li>
             ))}
           </ul>
@@ -31,9 +54,11 @@ export function SiteFooter() {
         <div className="footer-col">
           <h3>About</h3>
           <ul>
-            {aboutLinks.map((label) => (
-              <li key={label}>
-                <a href="#">{label}</a>
+            {aboutLinks.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="footer-link">
+                  {item.label}
+                </Link>
               </li>
             ))}
           </ul>
@@ -47,13 +72,19 @@ export function SiteFooter() {
       <div className="footer-bottom">
         <ul className="footer-social" aria-label="Social links">
           <li>
-            <a href="#">Instagram</a>
+            <span className="footer-social-link footer-social-link--static">
+              Instagram
+            </span>
           </li>
           <li>
-            <a href="#">Pinterest</a>
+            <span className="footer-social-link footer-social-link--static">
+              Pinterest
+            </span>
           </li>
           <li>
-            <a href="#">TikTok</a>
+            <span className="footer-social-link footer-social-link--static">
+              TikTok
+            </span>
           </li>
         </ul>
         <p className="footer-copy">&copy; Mohrbaugh</p>

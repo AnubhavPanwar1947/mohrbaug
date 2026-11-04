@@ -26,6 +26,7 @@ export type ApiProduct = {
   sizes?: string[];
   stock: number;
   imageUrl?: string;
+  imageUrls?: string[];
   search_score?: number;
   similarity_score?: number;
   match_type?: "exact" | "related" | string;

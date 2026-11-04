@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import type { ApiProduct } from "@/lib/recommendationApi";
@@ -34,8 +35,16 @@ export function NewArrivals({
       className="section new-arrivals"
       aria-labelledby="new-arrivals-heading"
     >
-      <div className="section-header">
-        <h2 id="new-arrivals-heading">New arrivals</h2>
+      <div className="section-header section-header--carousel">
+        <div className="section-header-title-group">
+          <h2 id="new-arrivals-heading">New arrivals</h2>
+          <Link
+            href="/collections/new-arrivals"
+            className="view-all-link"
+          >
+            View all
+          </Link>
+        </div>
 
         <div className="carousel-controls">
           <button

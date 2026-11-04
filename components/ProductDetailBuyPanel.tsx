@@ -1,7 +1,10 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 
+import { useShop } from "@/components/ShopProvider";
 import type { ApiProduct } from "@/lib/recommendationApi";
 
 type ProductDetailBuyPanelProps = {
@@ -21,6 +24,8 @@ function formatList(values?: string[]) {
 export function ProductDetailBuyPanel({
   product,
 }: ProductDetailBuyPanelProps) {
+  const router = useRouter();
+  const { addToCart, toggleWishlist, isInWishlist } = useShop();
   const pincodeFieldId = useId();
   const [selectedSize, setSelectedSize] = useState<string | null>(
     null
@@ -86,8 +91,13 @@ export function ProductDetailBuyPanel({
       return;
     }
 
+    addToCart(product, {
+      quantity,
+      size: selectedSize,
+    });
+
     setActionMessage(
-      `Added ${quantity} item${quantity > 1 ? "s" : ""} to cart.`
+      `Added ${quantity} item${quantity > 1 ? "s" : ""} to your bag.`
     );
   }
 
@@ -96,10 +106,23 @@ export function ProductDetailBuyPanel({
       return;
     }
 
+    addToCart(product, {
+      quantity,
+      size: selectedSize,
+    });
+    router.push("/checkout");
+  }
+
+  function handleToggleWishlist() {
+    const added = toggleWishlist(product);
     setActionMessage(
-      "Buy now is not connected to checkout yet."
+      added
+        ? "Saved to wishlist on this device."
+        : "Removed from wishlist."
     );
   }
+
+  const saved = isInWishlist(product.id);
 
   function handlePincodeCheck() {
     const normalized = pincode.trim();
@@ -220,6 +243,15 @@ export function ProductDetailBuyPanel({
         onClick={handleBuyNow}
       >
         Buy now
+      </button>
+
+      <button
+        type="button"
+        className="pdp-btn pdp-btn--outline"
+        onClick={handleToggleWishlist}
+        aria-pressed={saved}
+      >
+        {saved ? "Saved to wishlist" : "Save to wishlist"}
       </button>
 
       {actionMessage && (

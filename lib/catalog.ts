@@ -136,18 +136,22 @@ export const bestsellers: Product[] = [
 export const shopCategories = [
   {
     label: "Tops",
+    href: "/category/tops",
     image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80",
   },
   {
     label: "Bottoms",
+    href: "/category/bottoms",
     image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=800&q=80",
   },
   {
     label: "Outerwear",
+    href: "/category/outerwear",
     image: "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=800&q=80",
   },
   {
     label: "Denim",
+    href: "/category/denim",
     image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&q=80",
   },
 ];

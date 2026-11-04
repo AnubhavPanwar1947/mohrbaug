@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import type { ApiProduct } from "@/lib/recommendationApi";
+
+import { useShop } from "@/components/ShopProvider";
 import { ProductImage } from "@/components/ProductImage";
+import type { ApiProduct } from "@/lib/recommendationApi";
 
 type ProductCardProps = {
   product: ApiProduct;
@@ -12,8 +13,13 @@ type ProductCardProps = {
 export function ProductCard({
   product,
 }: ProductCardProps) {
-  const [saved, setSaved] = useState(false);
+  const { toggleWishlist, isInWishlist } = useShop();
+  const saved = isInWishlist(product.id);
   const productHref = `/products/${encodeURIComponent(product.id)}`;
+
+  function handleWishlistClick() {
+    toggleWishlist(product);
+  }
 
   return (
     <article
@@ -24,6 +30,7 @@ export function ProductCard({
         <Link
           href={productHref}
           className="product-card-link"
+          scroll
           aria-label={`View ${product.name}`}
         >
           <ProductImage
@@ -37,16 +44,22 @@ export function ProductCard({
         <button
           type="button"
           className="wishlist-btn"
-          aria-label={`Add ${product.name} to favorites`}
+          aria-label={
+            saved
+              ? `Remove ${product.name} from favorites`
+              : `Add ${product.name} to favorites`
+          }
           aria-pressed={saved}
-          onClick={() => setSaved((current) => !current)}
+          onClick={handleWishlistClick}
         >
           {saved ? "♥" : "♡"}
         </button>
       </div>
 
       <h3 className="product-name">
-        <Link href={productHref}>{product.name}</Link>
+        <Link href={productHref} scroll>
+          {product.name}
+        </Link>
       </h3>
 
       <p className="product-price">

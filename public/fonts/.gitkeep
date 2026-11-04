@@ -1,0 +1,7 @@
+Place licensed GT America webfont files here (do not copy from third-party websites):
+
+- GTAmerica-Regular.woff2 (weight 400, normal)
+- GTAmerica-Medium.woff2 (weight 500, normal)
+- GTAmerica-Italic.woff2 (weight 400, italic)
+
+Until these files are present, the site uses the CSS stack `"GT America", Arial, sans-serif` and renders with Arial.

@@ -1,89 +1,65 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
-  type FormEvent,
   useEffect,
   useRef,
   useState,
 } from "react";
 
+import { CartDrawer } from "@/components/CartDrawer";
+import { SearchDrawer } from "@/components/SearchDrawer";
+import { useShop } from "@/components/ShopProvider";
 import {
-  menCategories,
-  searchSuggestions,
-  womenCategories,
-} from "@/lib/catalog";
+  menCategoryLinks,
+  womenCategoryLinks,
+  type NavCategoryLink,
+} from "@/lib/categoryRoutes";
 
 type PanelName = "women" | "men";
 
-function CategoryList({ items }: { items: string[] }) {
+function CategoryList({ items }: { items: NavCategoryLink[] }) {
   return (
     <ul className="category-list">
       {items.map((item) => (
-        <li key={item}>
-          <a href="#">{item}</a>
+        <li key={item.href}>
+          <Link href={item.href} className="category-list-link">
+            {item.label}
+          </Link>
         </li>
       ))}
     </ul>
   );
 }
 
-export function SiteHeader({
-  solid = false,
-  withAnnouncement = false,
-}: {
-  solid?: boolean;
-  withAnnouncement?: boolean;
-}) {
-  const router = useRouter();
-  const [scrolled, setScrolled] = useState(false);
+export function SiteHeader() {
+  const { cartCount, wishlistCount } = useShop();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const [activePanel, setActivePanel] =
     useState<PanelName | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchToggleRef = useRef<HTMLButtonElement>(null);
+  const cartToggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 40);
-    };
-
-    onScroll();
-
-    window.addEventListener("scroll", onScroll, {
-      passive: true,
-    });
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (searchOpen) {
-      searchInputRef.current?.focus();
-    }
-  }, [searchOpen]);
-
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen
-      ? "hidden"
-      : "";
+    document.body.style.overflow =
+      mobileOpen || searchOpen || cartOpen ? "hidden" : "";
 
     return () => {
       document.body.style.overflow = "";
     };
-  }, [mobileOpen]);
+  }, [cartOpen, mobileOpen, searchOpen]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.key !== "Escape") return;
 
       setSearchOpen(false);
+      setCartOpen(false);
       setActivePanel(null);
       setMobileOpen(false);
     }
@@ -105,10 +81,18 @@ export function SiteHeader({
 
       if (
         searchOpen &&
-        !target.closest(".search-panel") &&
+        !target.closest(".site-drawer") &&
         !target.closest(".search-toggle")
       ) {
         setSearchOpen(false);
+      }
+
+      if (
+        cartOpen &&
+        !target.closest(".site-drawer") &&
+        !target.closest(".cart-toggle")
+      ) {
+        setCartOpen(false);
       }
     }
 
@@ -129,25 +113,20 @@ export function SiteHeader({
       document.removeEventListener("click", onPointerDown);
       window.removeEventListener("resize", onResize);
     };
-  }, [activePanel, searchOpen]);
+  }, [activePanel, cartOpen, searchOpen]);
 
   function openSearch() {
     setActivePanel(null);
     setMobileOpen(false);
+    setCartOpen(false);
     setSearchOpen(true);
   }
 
-  function submitSearch(
-    event: FormEvent<HTMLFormElement>
-  ) {
-    event.preventDefault();
-
-    const query = searchQuery.trim();
-
-    if (!query) return;
-
+  function openCart() {
+    setActivePanel(null);
+    setMobileOpen(false);
     setSearchOpen(false);
-    router.push(`/search?q=${encodeURIComponent(query)}`);
+    setCartOpen(true);
   }
 
   function togglePanel(name: PanelName) {
@@ -172,12 +151,7 @@ export function SiteHeader({
 
   return (
     <>
-      <header
-        className={`site-header${
-          solid || scrolled ? " is-scrolled" : ""
-        }${withAnnouncement ? " site-header--with-announcement" : ""}`}
-        id="site-header"
-      >
+      <header className="site-header" id="site-header">
         <div className="header-inner">
           <div className="header-left">
             <button
@@ -198,31 +172,43 @@ export function SiteHeader({
               aria-label="Primary"
             >
               <div className="nav-item">
+                <Link
+                  href="/category/women"
+                  className="nav-link"
+                  onClick={() => setActivePanel(null)}
+                >
+                  Women
+                </Link>
                 <button
                   type="button"
-                  className="nav-link nav-trigger"
+                  className="nav-link nav-trigger nav-trigger--caret"
                   aria-expanded={
                     activePanel === "women"
                   }
                   aria-controls="panel-women"
+                  aria-label="Show women categories"
                   onClick={() => togglePanel("women")}
-                >
-                  Women
-                </button>
+                />
               </div>
 
               <div className="nav-item">
+                <Link
+                  href="/category/men"
+                  className="nav-link"
+                  onClick={() => setActivePanel(null)}
+                >
+                  Men
+                </Link>
                 <button
                   type="button"
-                  className="nav-link nav-trigger"
+                  className="nav-link nav-trigger nav-trigger--caret"
                   aria-expanded={
                     activePanel === "men"
                   }
                   aria-controls="panel-men"
+                  aria-label="Show men categories"
                   onClick={() => togglePanel("men")}
-                >
-                  Men
-                </button>
+                />
               </div>
             </nav>
           </div>
@@ -252,10 +238,12 @@ export function SiteHeader({
           <div className="header-right">
             <div className="header-actions header-actions--compact">
               <button
+                ref={searchToggleRef}
                 type="button"
                 className="icon-btn icon-btn--hide-narrow search-toggle"
                 aria-expanded={searchOpen}
-                aria-controls="search-panel"
+                aria-controls="search-drawer"
+                aria-haspopup="dialog"
                 aria-label="Search"
                 onClick={() =>
                   searchOpen
@@ -277,10 +265,10 @@ export function SiteHeader({
                 </svg>
               </button>
 
-              <a
-                href="#"
+              <Link
+                href="/wishlist"
                 className="icon-btn icon-btn--hide-narrow"
-                aria-label="Favorites"
+                aria-label={`Favorites, ${wishlistCount} saved`}
               >
                 <svg
                   width="22"
@@ -293,12 +281,22 @@ export function SiteHeader({
                 >
                   <path d="M12 21s-8-4.5-8-11a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6.5-8 11-8 11z" />
                 </svg>
-              </a>
+                {wishlistCount > 0 ? (
+                  <span className="bag-count">{wishlistCount}</span>
+                ) : null}
+              </Link>
 
-              <a
-                href="#"
-                className="icon-btn bag-btn"
-                aria-label="Shopping bag, 2 items"
+              <button
+                ref={cartToggleRef}
+                type="button"
+                className="icon-btn bag-btn cart-toggle"
+                aria-expanded={cartOpen}
+                aria-controls="cart-drawer"
+                aria-haspopup="dialog"
+                aria-label={`Shopping bag, ${cartCount} items`}
+                onClick={() =>
+                  cartOpen ? setCartOpen(false) : openCart()
+                }
               >
                 <svg
                   width="22"
@@ -313,13 +311,17 @@ export function SiteHeader({
                   <path d="M9 7V5a3 3 0 0 1 6 0v2" />
                 </svg>
 
-                <span className="bag-count">2</span>
-              </a>
+                {cartCount > 0 ? (
+                  <span className="bag-count">{cartCount}</span>
+                ) : null}
+              </button>
 
-              <a
-                href="#"
+              <button
+                type="button"
                 className="icon-btn icon-btn--hide-narrow"
-                aria-label="Account"
+                aria-label="Account (coming soon)"
+                disabled
+                title="Sign in coming soon"
               >
                 <svg
                   width="22"
@@ -333,7 +335,7 @@ export function SiteHeader({
                   <circle cx="12" cy="8" r="4" />
                   <path d="M4 20c0-4 3.5-7 8-7s8 3 8 7" />
                 </svg>
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -350,7 +352,7 @@ export function SiteHeader({
             aria-label="Women categories"
             hidden={activePanel !== "women"}
           >
-            <CategoryList items={womenCategories} />
+            <CategoryList items={womenCategoryLinks} />
           </div>
 
           <div
@@ -360,79 +362,24 @@ export function SiteHeader({
             aria-label="Men categories"
             hidden={activePanel !== "men"}
           >
-            <CategoryList items={menCategories} />
-          </div>
-        </div>
-
-        <div
-          className="search-panel"
-          id="search-panel"
-          hidden={!searchOpen}
-        >
-          <div className="search-panel-inner">
-            <form
-              className="search-form"
-              onSubmit={submitSearch}
-            >
-              <label
-                className="search-label"
-                htmlFor="search-input"
-              >
-                Search Mohrbaugh
-              </label>
-
-              <div className="search-input-row">
-                <input
-                  ref={searchInputRef}
-                  type="search"
-                  id="search-input"
-                  className="search-input"
-                  placeholder="Search clothing, categories…"
-                  autoComplete="off"
-                  value={searchQuery}
-                  onChange={(event) =>
-                    setSearchQuery(event.target.value)
-                  }
-                />
-
-                <button
-                  type="submit"
-                  className="search-submit"
-                >
-                  Search
-                </button>
-              </div>
-            </form>
-
-            {!searchQuery.trim() && (
-              <>
-                <p className="search-suggestions-label">
-                  Popular searches
-                </p>
-
-                <ul className="search-suggestions">
-                  {searchSuggestions.map((term) => (
-                    <li key={term}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSearchQuery(term);
-                          setSearchOpen(false);
-                          router.push(
-                            `/search?q=${encodeURIComponent(term)}`
-                          );
-                        }}
-                      >
-                        {term}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
+            <CategoryList items={menCategoryLinks} />
           </div>
         </div>
       </header>
+
+      <SearchDrawer
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        returnFocusRef={searchToggleRef}
+        searchQuery={searchQuery}
+        onSearchQueryChange={setSearchQuery}
+      />
+
+      <CartDrawer
+        open={cartOpen}
+        onClose={() => setCartOpen(false)}
+        returnFocusRef={cartToggleRef}
+      />
 
       <div
         className="mobile-nav-overlay"
@@ -467,9 +414,15 @@ export function SiteHeader({
             <summary>Women</summary>
 
             <ul>
-              {womenCategories.map((item) => (
-                <li key={item}>
-                  <a href="#">{item}</a>
+              {womenCategoryLinks.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="mobile-nav-link"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -479,9 +432,15 @@ export function SiteHeader({
             <summary>Men</summary>
 
             <ul>
-              {menCategories.map((item) => (
-                <li key={item}>
-                  <a href="#">{item}</a>
+              {menCategoryLinks.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="mobile-nav-link"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -497,13 +456,33 @@ export function SiteHeader({
             Search
           </button>
 
-          <a href="#" className="mobile-nav-action">
+          <Link
+            href="/wishlist"
+            className="mobile-nav-action"
+            onClick={() => setMobileOpen(false)}
+          >
             Favorites
-          </a>
+          </Link>
 
-          <a href="#" className="mobile-nav-action">
-            Account
-          </a>
+          <button
+            type="button"
+            className="mobile-nav-action"
+            onClick={() => {
+              setMobileOpen(false);
+              openCart();
+            }}
+          >
+            Bag ({cartCount})
+          </button>
+
+          <button
+            type="button"
+            className="mobile-nav-action"
+            disabled
+            title="Sign in coming soon"
+          >
+            Account (soon)
+          </button>
         </div>
       </aside>
     </>

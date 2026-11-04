@@ -26,6 +26,7 @@ export function SearchResultCard({
         <Link
           href={productHref}
           className="search-result-card-image-link"
+          scroll
           aria-label={`View ${product.name}`}
         >
           <ProductImage
@@ -48,7 +49,7 @@ export function SearchResultCard({
         </button>
       </div>
 
-      <Link href={productHref} className="search-result-card-details">
+      <Link href={productHref} className="search-result-card-details" scroll>
         <h3 className="search-result-card-name">{product.name}</h3>
         <p className="search-result-card-category">{product.category}</p>
         <p className="search-result-card-price">
