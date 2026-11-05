@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Mohrbaugh">
+  <rect width="512" height="512" fill="#11175B" />
+  <path
+    fill="#FFFFFF"
+    d="M92 420V92h48l116 176 116-176h48v328h-56V235L256 355 148 235v185H92z"
+  />
+</svg>
